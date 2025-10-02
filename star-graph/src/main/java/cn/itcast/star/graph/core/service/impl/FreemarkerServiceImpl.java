@@ -62,4 +62,24 @@ public class FreemarkerServiceImpl implements FreemarkerService {
         template.process(data, out);
         return out.toString();
     }
+    
+    @Override
+    public String renderText2Video(Map<String, Object> params) throws Exception {
+        Template template = configuration.getTemplate("t2v.ftlh");
+        Map<String,Object> data = new HashMap<>();
+        data.put("config", params);
+        StringWriter out = new StringWriter();
+        template.process(data, out);
+        return out.toString();
+    }
+    
+    @Override
+    public String renderImage2Video(Map<String, Object> params) throws Exception {
+        Template template = configuration.getTemplate("i2v.ftlh");
+        Map<String,Object> data = new HashMap<>();
+        data.put("config", params);
+        StringWriter out = new StringWriter();
+        template.process(data, out);
+        return out.toString();
+    }
 }

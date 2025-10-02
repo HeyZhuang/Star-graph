@@ -49,7 +49,7 @@ export const constantRoutes: RouteRecordRaw[] = [
   {
     path: "/t2v",
     name: "Text2Video",
-    component: () => import("@/views/empty.vue"),
+    component: () => import("@/views/t2v/index.vue"),
     meta: {
       title: "文生视频",
     },
@@ -57,7 +57,7 @@ export const constantRoutes: RouteRecordRaw[] = [
   {
     path: "/i2v",
     name: "Image2Video",
-    component: () => import("@/views/empty.vue"),
+    component: () => import("@/views/i2v/index.vue"),
     meta: {
       title: "图生视频",
     },

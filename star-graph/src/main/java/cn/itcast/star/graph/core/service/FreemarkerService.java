@@ -36,5 +36,21 @@ public interface FreemarkerService {
      * @throws Exception
      */
     public String renderPose(Map<String, Object> params) throws Exception;
+    
+    /**
+     * 渲染文生视频工作流
+     * @param params
+     * @return
+     * @throws Exception
+     */
+    public String renderText2Video(Map<String, Object> params) throws Exception;
+    
+    /**
+     * 渲染图生视频工作流
+     * @param params
+     * @return
+     * @throws Exception
+     */
+    public String renderImage2Video(Map<String, Object> params) throws Exception;
 
 }
