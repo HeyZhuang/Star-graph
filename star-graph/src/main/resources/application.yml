@@ -9,4 +9,25 @@ spring:
       host: localhost
       port: 6379
 server:
-  port: 8080  
+  port: 8080
+
+# AI 服务提供商配置
+ai:
+  # 服务提供商选择：comfyui | tongyi | auto
+  # - comfyui: 使用本地 ComfyUI
+  # - tongyi: 使用阿里云通义万相
+  # - auto: 自动选择（优先通义万相，失败回退到 ComfyUI）
+  provider: tongyi
+
+  # 降级开关：当主服务失败时是否自动切换到备用服务
+  fallback:
+    enabled: true
+
+# 通义万相配置
+tongyi:
+  # API Key（从阿里云控制台获取）
+  # 获取地址：https://dashscope.console.aliyun.com/apiKey
+  api-key: ${TONGYI_API_KEY:your-api-key-here}
+
+  # API 基础 URL（默认无需修改）
+  base-url: https://dashscope.aliyuncs.com/api/v1/
