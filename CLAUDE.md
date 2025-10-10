@@ -78,6 +78,7 @@ The project implements a dual WebSocket architecture:
 - Retrofit 2.11.0 for HTTP client (ComfyUI API)
 - Hutool 5.8.28 utilities
 - Redisson 3.30.0 for distributed locks
+- Alibaba DashScope SDK 2.12.0 for Tongyi Wanxiang API
 
 **Frontend**:
 - Vue 3.4.x + TypeScript 5.x
@@ -97,18 +98,45 @@ The project implements a dual WebSocket architecture:
 - User queue management system
 - WebSocket-based live updates
 - User fund tracking and transaction records
-- Integration with ComfyUI AI service
+- **Hybrid AI Architecture**: Support for both local ComfyUI and cloud-based Tongyi Wanxiang API
+- **Automatic Fallback**: Intelligent service switching when primary provider fails
 
-## Workflow Template System
+## AI Service Architecture
 
-The project uses **Freemarker templates** to generate ComfyUI workflow JSON. Key concepts:
+### Hybrid AI Provider System
+The platform supports multiple AI image generation backends:
 
-- **Templates Location**: `star-graph/src/main/resources/templates/`
+**Service Providers** (configured in `application.yml`):
+- `comfyui` - Local ComfyUI (requires GPU)
+- `tongyi` - Alibaba Tongyi Wanxiang API (cloud-based)
+- `auto` - Automatic selection with fallback (priority: Tongyi → ComfyUI)
+
+**Configuration**:
+```yaml
+ai:
+  provider: tongyi  # comfyui | tongyi | auto
+  fallback:
+    enabled: true   # Auto-fallback on failure
+
+tongyi:
+  api-key: ${TONGYI_API_KEY:your-api-key-here}
+```
+
+**Service Routing**:
+- `HybridText2ImageServiceImpl` acts as the router
+- Routes requests based on `ai.provider` configuration
+- Implements automatic fallback when enabled
+- See `TONGYI_INTEGRATION.md` for detailed setup
+
+### Workflow Template System (ComfyUI)
+The project uses **Freemarker templates** to generate ComfyUI workflow JSON:
+
+- **Templates Location**: `star-graph/src/main/resources/templates/` (e.g., `t2i.ftlh`)
 - **Workflow Generation**: Service layer populates templates with user parameters (prompt, size, steps, etc.)
 - **ComfyUI Integration**: Generated workflows are sent via Retrofit HTTP client to ComfyUI API
 - **Template Variables**: Common variables include `${prompt}`, `${width}`, `${height}`, `${steps}`, `${seed}`
 
-When modifying AI generation features:
+When modifying ComfyUI generation features:
 1. Update the Freemarker template in `templates/`
 2. Update the service method that populates template variables
 3. Test the generated workflow JSON with ComfyUI API
@@ -129,3 +157,33 @@ When modifying AI generation features:
 - Auto-reconnection with 5-second delays for WebSocket stability
 - **ComfyUI Communication**: Backend maintains persistent WebSocket to ComfyUI for progress updates
 - **Scheduled Tasks**: Check `job/` package for background task processors (queue polling, cleanup, etc.)
+- **Environment Variables**: Set `TONGYI_API_KEY` for Tongyi Wanxiang integration (see `TONGYI_INTEGRATION.md`)
+
+## Service Layer Architecture
+
+The service layer follows a hybrid pattern with service interfaces and multiple implementations:
+
+**Key Services**:
+- `TongyiImageService` - Alibaba Tongyi Wanxiang integration
+- `Text2ImageService` - Base interface for text-to-image generation
+- `HybridText2ImageServiceImpl` - Router for ComfyUI/Tongyi selection
+- `Image2ImageService` - Image-to-image transformation
+- `UpscaleService` - Image quality enhancement
+- `PoseService` - Pose-guided generation
+- `WsNoticeService` - WebSocket notification service
+- `FreemarkerService` - Template rendering for ComfyUI workflows
+
+**Service Package Structure**:
+```
+core/service/
+├── TongyiImageService.java          # Interface
+├── impl/
+│   ├── TongyiImageServiceImpl.java  # Tongyi implementation
+│   └── HybridText2ImageServiceImpl.java  # Service router
+```
+
+When adding new AI generation features:
+1. Create service interface in `core/service/`
+2. Implement in `core/service/impl/`
+3. Consider supporting both local (ComfyUI) and cloud (Tongyi) providers
+4. Use WebSocket (`WsNoticeService`) for real-time progress updates
