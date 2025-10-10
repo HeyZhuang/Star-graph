@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: 87sdhf298TYUUIz2!
+    username: root
+    url: jdbc:mysql://localhost:3306/star-graph?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+server:
+  port: 8080  
