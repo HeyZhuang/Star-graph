@@ -105,8 +105,8 @@ import {ElMessageBox} from "element-plus";
 const router = useRouter();
 const userStore = useUserStore();
 
-const path = ref('/home');
-path.value = router.currentRoute.value.path || '/home'
+const path = ref();
+path.value = router.currentRoute.value
 function go(link: string){
   router.push(link)
   path.value = link
