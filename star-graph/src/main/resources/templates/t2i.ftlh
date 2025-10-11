@@ -4,7 +4,7 @@
 "seed": ${config.seed},
 "steps": ${config.step},
 "cfg": ${config.cfg},
-"sampler_name": ${config.samplerName!"default_value"},
+"sampler_name": "${config.samplerName!"euler"}",
 "scheduler": "${config.scheduler}",
 "denoise": 1,
 "model": [

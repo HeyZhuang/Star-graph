@@ -60,5 +60,22 @@ public class Text2ImageReqDto {
         }
     }
 
+    /**
+     * 获取通义万相API支持的图片尺寸
+     * 支持的尺寸: 1024*1024, 720*1280, 1280*720, 768*1152
+     */
+    public String tongyiSize() {
+        // 根据scale映射到通义万相支持的尺寸
+        switch (scale) {
+            case 2: // 竖图 (原512x768)
+                return "720*1280";
+            case 3: // 横图 (原768x512)
+                return "1280*720";
+            case 1: // 方图 (原512x512)
+            default:
+                return "1024*1024";
+        }
+    }
+
 
 }

@@ -1,14 +1,14 @@
 package cn.itcast.star.graph.tongyi.client.config;
 
 import cn.itcast.star.graph.tongyi.client.api.TongyiApi;
-import com.squareup.okhttp3.OkHttpClient;
-import com.squareup.okhttp3.logging.HttpLoggingInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import java.util.concurrent.TimeUnit;
 
 /**

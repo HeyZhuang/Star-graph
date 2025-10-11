@@ -97,6 +97,7 @@
 import { ref, onMounted } from "vue";
 import PoseAPI from "@/api/pose";
 import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 import Loading from "@/components/Loading.vue";
 import ResultImageView from "@/components/ResultImageView.vue";
 import InputOption from "@/components/InputOption.vue";
@@ -197,7 +198,7 @@ function parseMessage(mes){
 
 onMounted(() => {
   const client = new Client({
-    brokerURL: import.meta.env.VITE_WS_HOST_URL,
+    webSocketFactory: () => new SockJS(import.meta.env.VITE_WS_HOST_URL),
     connectHeaders: {
       clientId: clientId.value
     },

@@ -1,5 +1,6 @@
 package cn.itcast.star.graph.tongyi.client.pojo;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import java.util.List;
 
@@ -47,9 +48,14 @@ public class TongyiText2ImageResponse {
         private String submit_time;
 
         /**
-         * 任务结束时间
+         * 任务调度时间
          */
         private String scheduled_time;
+
+        /**
+         * 任务结束时间
+         */
+        private String end_time;
 
         /**
          * 错误码
@@ -60,6 +66,32 @@ public class TongyiText2ImageResponse {
          * 错误信息
          */
         private String message;
+
+        /**
+         * 任务指标
+         */
+        private TaskMetrics task_metrics;
+    }
+
+    @Data
+    public static class TaskMetrics {
+        /**
+         * 总数
+         */
+        @JsonProperty("TOTAL")
+        private Integer total;
+
+        /**
+         * 成功数
+         */
+        @JsonProperty("SUCCEEDED")
+        private Integer succeeded;
+
+        /**
+         * 失败数
+         */
+        @JsonProperty("FAILED")
+        private Integer failed;
     }
 
     @Data

@@ -22,12 +22,15 @@ public class WebscoketUserInterceptor implements ChannelInterceptor {
 
             if(clientIds!=null&&clientIds.size()>0){
                 String clientId = clientIds.get(0);
+                System.out.println("DEBUG: WebSocket 连接 - clientId: " + clientId);
                 accessor.setUser(new Principal() {
                     @Override
                     public String getName() {
                         return clientId;
                     }
                 });
+            } else {
+                System.out.println("DEBUG: WebSocket 连接 - 无 clientId header");
             }
         }
         return message;

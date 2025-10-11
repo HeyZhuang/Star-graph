@@ -33,7 +33,7 @@ public class Text2VideoServiceImpl implements Text2VideoService {
     @Override
     public VideoGenerationResponseDto textToVideo(Text2VideoReqDto text2VideoReqDto) throws Exception {
         // 检查用户余额（视频生成消耗更多积分）
-        Long userId = UserUtils.getUserId();
+        Long userId = UserUtils.getUser().getId();
         int balance = userFundRecordService.checkBalance(userId);
         int requiredPoints = calculateRequiredPoints(text2VideoReqDto.getDuration());
         
@@ -45,7 +45,7 @@ public class Text2VideoServiceImpl implements Text2VideoService {
         ComfyuiTask comfyuiTask = getComfyuiTask(text2VideoReqDto);
         
         // 添加到任务队列
-        long queueIndex = redisService.addTask(comfyuiTask);
+        comfyuiTask = redisService.addQueueTask(comfyuiTask);
         
         // 扣费
         userFundRecordService.deductBalance(userId, requiredPoints);
@@ -54,7 +54,7 @@ public class Text2VideoServiceImpl implements Text2VideoService {
         responseDto.setCode("200");
         responseDto.setMsg("文生视频任务已提交");
         responseDto.setPid(comfyuiTask.getId());
-        responseDto.setQueueIndex((int) queueIndex);
+        responseDto.setQueueIndex((int) comfyuiTask.getIndex());
         responseDto.setDuration(text2VideoReqDto.getDuration());
         responseDto.setFps(text2VideoReqDto.getFps());
         
@@ -95,7 +95,7 @@ public class Text2VideoServiceImpl implements Text2VideoService {
         
         ComfyuiTask task = new ComfyuiTask();
         task.setClientId(clientId);
-        task.setUserId(UserUtils.getUserId());
+        task.setUserId(UserUtils.getUser().getId());
         task.setRequestDto(requestDto);
         task.setType("text2video");
         task.setSize(text2VideoReqDto.getDuration() * text2VideoReqDto.getFps()); // 总帧数

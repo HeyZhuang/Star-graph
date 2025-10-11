@@ -20,6 +20,7 @@ import InputOption from "@/components/InputOption.vue";
 import {onMounted, ref} from "vue";
 import Text2ImageAPI from "@/api/t2i";
 import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 import Loading from "@/components/Loading.vue";
 import {ElMessage, ElMessageBox} from "element-plus";
 const loading = ref<Loading>();
@@ -130,7 +131,8 @@ console.log('收到消息：',mes)
 }
 onMounted(()=>{
   const client = new Client({
-    brokerURL: import.meta.env.VITE_WS_HOST_URL,
+    // 使用 SockJS 而不是原生 WebSocket
+    webSocketFactory: () => new SockJS(import.meta.env.VITE_WS_HOST_URL),
     connectHeaders: {
       clientId: clientId.value
     },

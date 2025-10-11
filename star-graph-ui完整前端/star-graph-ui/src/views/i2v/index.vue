@@ -159,6 +159,7 @@ import { ref, computed, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { Picture, VideoPlay, Close, Film, Download, Share } from "@element-plus/icons-vue";
 import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 import Loading from "@/components/Loading.vue";
 import Image2VideoAPI from "@/api/i2v";
 
@@ -277,7 +278,7 @@ function parseMessage(mes: string) {
 
 onMounted(() => {
   const client = new Client({
-    brokerURL: import.meta.env.VITE_WS_HOST_URL,
+    webSocketFactory: () => new SockJS(import.meta.env.VITE_WS_HOST_URL),
     connectHeaders: {
       clientId: clientId.value
     },

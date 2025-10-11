@@ -93,7 +93,17 @@ public class UserFundRecordServiceImpl extends ServiceImpl<SgUserFundRecordMappe
 
     @Override
     public void directDeduction(Long userId, Integer money) {
+        SgUserFund userFund = getUserSgUserFund(userId);
 
+        long temp = userFund.getScore() - money;
+        if(temp >= 0){
+            // 直接从用户积分账户扣除
+            userFund.setScore(temp);
+            saveLog(0, -money, userFund.getId());
+            sgUserFundMapper.updateById(userFund);
+        } else {
+            throw new CustomException("积分账户余额不足");
+        }
     }
 
     private void saveLog(int fundType,int money,long fundId){
@@ -125,7 +135,7 @@ public class UserFundRecordServiceImpl extends ServiceImpl<SgUserFundRecordMappe
     @Override
     public int checkBalance(Long userId) {
         SgUserFund sgUserFund = getUserSgUserFund(userId);
-        return (int) sgUserFund.getScore();
+        return sgUserFund.getScore().intValue();
     }
     
     /**

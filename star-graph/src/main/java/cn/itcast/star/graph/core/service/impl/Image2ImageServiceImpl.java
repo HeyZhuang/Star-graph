@@ -33,7 +33,7 @@ public class Image2ImageServiceImpl implements Image2ImageService {
     @Override
     public Text2ImageResponeDto imageToImage(Image2ImageReqDto image2ImageReqDto) throws Exception {
         // 检查用户余额
-        Long userId = UserUtils.getUserId();
+        Long userId = UserUtils.getUser().getId();
         int balance = userFundRecordService.checkBalance(userId);
         if(balance < 5){
             throw new CustomException("余额不足，请充值");
@@ -43,14 +43,12 @@ public class Image2ImageServiceImpl implements Image2ImageService {
         ComfyuiTask comfyuiTask = getComfyuiTask(image2ImageReqDto);
         
         // 添加到任务队列
-        redisService.addTask(comfyuiTask);
+        redisService.addQueueTask(comfyuiTask);
         
         // 扣费
         userFundRecordService.deductBalance(userId, 5);
         
         Text2ImageResponeDto responeDto = new Text2ImageResponeDto();
-        responeDto.setCode("200");
-        responeDto.setMsg("图生图任务已提交");
         return responeDto;
     }
 
@@ -93,7 +91,7 @@ public class Image2ImageServiceImpl implements Image2ImageService {
         
         ComfyuiTask task = new ComfyuiTask();
         task.setClientId(image2ImageReqDto.getClientId());
-        task.setUserId(UserUtils.getUserId());
+        task.setUserId(UserUtils.getUser().getId());
         task.setRequestDto(requestDto);
         task.setType("image2image");
         

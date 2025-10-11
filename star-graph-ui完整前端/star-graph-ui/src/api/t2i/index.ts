@@ -24,7 +24,7 @@ class Text2ImageAPI {
      */
     static canelGen(data) {
         return request<any>({
-            url: "/api/authed/1.0/t2i/canel",
+            url: "/api/authed/1.0/t2i/cancel",
             method: "post",
             data: data
         });
@@ -38,7 +38,7 @@ class Text2ImageAPI {
      */
     static proprityTask(data) {
         return request<any>({
-            url: "/api/authed/1.0/t2i/proprity",
+            url: "/api/authed/1.0/t2i/priority",
             method: "post",
             data: data
         });
@@ -54,7 +54,7 @@ class Text2ImageAPI {
         return request<any>({
             url: "/api/authed/1.0/t2i/list",
             method: "post",
-            data: data
+            params: data  // 使用 params 而不是 data，将参数放在 URL 查询字符串中
         });
     }
 }

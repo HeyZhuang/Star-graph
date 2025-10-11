@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Star-Graph is a full-stack AI image generation platform with real-time communication capabilities:
 
-### Backend (Spring Boot + Java 17)
+### Backend (Spring Boot + Java 11)
 - **Location**: `star-graph/`
 - **Main Application**: `src/main/java/cn/itcast/StarGraphApp.java`
 - **Package Structure**: `cn.itcast.star.graph.core.*`
@@ -16,6 +16,7 @@ Star-Graph is a full-stack AI image generation platform with real-time communica
   - `mapper/` - MyBatis mappers
   - `service/` - Business logic services
   - `controller/` - REST API controllers
+- **Test Structure**: `src/test/java/cn/itcast/` - Test files follow naming pattern `*Test.java`
 
 ### Frontend (Vue 3 + TypeScript + Vite)
 - **Location**: `star-graph-ui完整前端/star-graph-ui/`
@@ -150,6 +151,43 @@ When modifying ComfyUI generation features:
   - User sessions: `session:*`
   - Distributed locks: via Redisson
 
+## Git Workflow
+
+**Branches**:
+- `main` - Production-ready code
+- `master` - Legacy main branch
+- `feature/*` - Feature development branches (e.g., `feature/third-party-ai-api`)
+
+**Current Working Branch**: `feature/third-party-ai-api` (Tongyi Wanxiang integration)
+
+When creating pull requests, the main branch to target is not explicitly set, so check with the team or use `main` as the default.
+
+## Environment Configuration
+
+### Backend Environment Variables
+Configure sensitive data via environment variables (recommended) or `application-local.yml` (ignored by git):
+
+```bash
+export TONGYI_API_KEY=sk-your-api-key-here
+```
+
+**Important**: Never commit `application-local.yml`, `application-dev.yml`, or files with API keys to git. These are already in `.gitignore`.
+
+### Frontend Environment Files
+- `.env.development` - Development environment (proxies to `localhost:8080`)
+- `.env.production` - Production environment (configure actual server URLs)
+
+**Development** (localhost):
+```env
+VITE_PROXY_URL = http://localhost:8080
+VITE_WS_HOST_URL = ws://localhost:8080/ws
+```
+
+**Production** (example):
+```env
+VITE_WS_HOST_URL = ws://your-server:8082/ws
+```
+
 ## Important Notes
 - The project uses Chinese documentation and comments
 - WebSocket connections use client ID for user identification
@@ -158,6 +196,7 @@ When modifying ComfyUI generation features:
 - **ComfyUI Communication**: Backend maintains persistent WebSocket to ComfyUI for progress updates
 - **Scheduled Tasks**: Check `job/` package for background task processors (queue polling, cleanup, etc.)
 - **Environment Variables**: Set `TONGYI_API_KEY` for Tongyi Wanxiang integration (see `TONGYI_INTEGRATION.md`)
+- **Security**: Database passwords and API keys should be configured via environment variables in production
 
 ## Service Layer Architecture
 
@@ -187,3 +226,40 @@ When adding new AI generation features:
 2. Implement in `core/service/impl/`
 3. Consider supporting both local (ComfyUI) and cloud (Tongyi) providers
 4. Use WebSocket (`WsNoticeService`) for real-time progress updates
+
+## API Endpoints
+
+**Image Generation APIs** (all under `/api/authed/1.0/`):
+- `POST /t2i/propmt` - Text-to-image generation
+- `POST /i2i/generate` - Image-to-image transformation
+- `POST /upscale/enhance` - Image quality enhancement (2x/4x upscaling)
+- `POST /pose/generate` - Pose-guided image generation
+- `POST /t2v/generate` - Text-to-video generation
+- `POST /i2v/generate` - Image-to-video generation
+
+**User APIs**:
+- User authentication and fund management endpoints
+
+## Testing
+
+**Test Execution**:
+```bash
+# Run all tests
+mvn test
+
+# Run specific test class
+mvn test -Dtest=UserTest
+mvn test -Dtest=FreemarkerTest
+mvn test -Dtest=ComfyuiApiTest
+```
+
+**Test Structure**:
+- Test files are located in `star-graph/src/test/java/cn/itcast/`
+- Follow naming convention: `*Test.java` (e.g., `UserTest.java`, `FreemarkerTest.java`)
+- Tests typically use Spring Boot test annotations (`@SpringBootTest`)
+
+**Key Test Files**:
+- `FreemarkerTest.java` - Template generation tests
+- `ComfyuiApiTest.java` - ComfyUI API integration tests
+- `UserTest.java` - User service tests
+- `UserFundTest.java` - Fund transaction tests

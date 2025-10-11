@@ -65,6 +65,7 @@
 import { ref, onMounted } from "vue";
 import UpscaleAPI from "@/api/upscale";
 import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 import Loading from "@/components/Loading.vue";
 import ResultImageView from "@/components/ResultImageView.vue";
 import { ElMessage } from "element-plus";
@@ -152,7 +153,7 @@ function parseMessage(mes){
 
 onMounted(() => {
   const client = new Client({
-    brokerURL: import.meta.env.VITE_WS_HOST_URL,
+    webSocketFactory: () => new SockJS(import.meta.env.VITE_WS_HOST_URL),
     connectHeaders: {
       clientId: clientId.value
     },

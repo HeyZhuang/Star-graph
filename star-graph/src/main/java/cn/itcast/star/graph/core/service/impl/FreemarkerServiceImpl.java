@@ -22,7 +22,7 @@ public class FreemarkerServiceImpl implements FreemarkerService {
     public String renderText2Image(ComfyuiModel model) throws Exception {
         Template template = configuration.getTemplate("t2i.ftlh");
         Map<String,Object> data = new HashMap<>();
-        data.put("config",model);
+        data.put("config", model);
         StringWriter out = new StringWriter();
 //        FileWriter fw = new FileWriter("d:/1.txt");
         /**

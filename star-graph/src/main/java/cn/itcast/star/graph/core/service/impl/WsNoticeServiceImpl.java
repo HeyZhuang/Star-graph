@@ -15,6 +15,8 @@ public class WsNoticeServiceImpl implements WsNoticeService {
 
     @Override
     public void sendToUser(String clientId, String message) {
+        System.out.println("DEBUG: 发送 WebSocket 消息到 clientId: " + clientId);
+        System.out.println("DEBUG: 消息内容: " + message);
         simpMessagingTemplate.convertAndSendToUser(clientId,COMFYUI_QUEUE_TOPIC,message);
     }
 

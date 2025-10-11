@@ -58,9 +58,9 @@ public class TongyiImageServiceImpl implements TongyiImageService {
         Long userId = UserUtils.getUser().getId();
         userFundRecordService.pointsFreeze(userId, reqDto.getSize());
 
-        // 3. 翻译提示词（可选，通义万相支持中文）
-        String positivePrompt = ollamaService.translate(reqDto.getPropmt());
-        String negativePrompt = ollamaService.translate(reqDto.getReverse());
+        // 3. 使用原始提示词（通义万相原生支持中文，无需翻译）
+        String positivePrompt = reqDto.getPropmt();
+        String negativePrompt = reqDto.getReverse() != null ? reqDto.getReverse() : "";
 
         log.info("通义万相文生图 - 用户ID: {}, 提示词: {}", userId, positivePrompt);
 
@@ -73,9 +73,9 @@ public class TongyiImageServiceImpl implements TongyiImageService {
         request.setInput(input);
 
         TongyiText2ImageRequest.Parameters parameters = new TongyiText2ImageRequest.Parameters();
-        parameters.setSize(reqDto.width() + "*" + reqDto.height());
+        parameters.setSize(reqDto.tongyiSize());
         parameters.setN(reqDto.getSize());
-        parameters.setSeed(reqDto.seed());
+        parameters.setSeed((long) reqDto.getSeed());
         request.setParameters(parameters);
 
         // 5. 异步调用 API
@@ -162,10 +162,20 @@ public class TongyiImageServiceImpl implements TongyiImageService {
                     // 保存结果
                     userResultService.saveList(imageUrls, userId);
 
-                    // 扣除积分
-                    userFundRecordService.pointsDeduct(userId, imageCount);
+                    // 扣除积分（失败不影响图片返回）
+                    try {
+                        userFundRecordService.pointsDeduction(userId, imageCount);
+                    } catch (Exception e) {
+                        log.warn("积分扣除失败，但图片已生成 - 用户: {}, 错误: {}", userId, e.getMessage());
+                        // 尝试归还冻结积分
+                        try {
+                            userFundRecordService.freezeReturn(userId, imageCount);
+                        } catch (Exception ex) {
+                            log.error("归还冻结积分失败 - 用户: {}", userId, ex);
+                        }
+                    }
 
-                    // 推送结果
+                    // 推送结果（无论积分扣除是否成功）
                     Map<String, Object> resultMsg = new HashMap<>();
                     resultMsg.put("type", "imageResult");
                     resultMsg.put("urls", imageUrls);

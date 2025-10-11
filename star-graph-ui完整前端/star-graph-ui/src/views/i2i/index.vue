@@ -40,6 +40,7 @@ import InputOption from "@/components/InputOption.vue";
 import { onMounted, ref } from "vue";
 import Image2ImageAPI from "@/api/i2i";
 import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 import Loading from "@/components/Loading.vue";
 import { ElMessage, ElMessageBox, ElUpload } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
@@ -130,7 +131,7 @@ function parseMessage(mes){
 
 onMounted(() => {
   const client = new Client({
-    brokerURL: import.meta.env.VITE_WS_HOST_URL,
+    webSocketFactory: () => new SockJS(import.meta.env.VITE_WS_HOST_URL),
     connectHeaders: {
       clientId: clientId.value
     },

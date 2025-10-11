@@ -48,6 +48,8 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     ],
     define: {
       __APP_ENV__: JSON.stringify(env.APP_ENV),
+      // 修复 sockjs-client 的 global is not defined 错误
+      global: 'globalThis',
     },
   }
 })

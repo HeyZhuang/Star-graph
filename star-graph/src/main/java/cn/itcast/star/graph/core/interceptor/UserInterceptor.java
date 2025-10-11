@@ -41,7 +41,21 @@ public class UserInterceptor implements HandlerInterceptor {
             writeAuthorizationedFailed(response);
             return false;
         }
-        User user = JwtUtils.getToekn(token);
+
+        // 解析 token，捕获异常避免 500 错误
+        User user = null;
+        try {
+            System.out.println("DEBUG: Received token: " + token);
+            user = JwtUtils.getToekn(token);
+            System.out.println("DEBUG: Parsed user: " + (user != null ? user.getUsername() : "null"));
+        } catch (Exception e) {
+            // Token 格式错误或解析失败，返回 401
+            System.err.println("DEBUG: Token parsing failed: " + e.getMessage());
+            e.printStackTrace();
+            writeAuthorizationedFailed(response);
+            return false;
+        }
+
         if(user==null){
             writeAuthorizationedFailed(response);
             return false;
